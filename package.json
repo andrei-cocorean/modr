@@ -1,0 +1,17 @@
+{
+  "name": "modr",
+  "version": "0.0.0",
+  "description": "extend require() calls",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "require",
+    "plugins",
+    "hooks",
+    "extensions"
+  ],
+  "author": "Andrei Cocorean",
+  "license": "MIT"
+}
