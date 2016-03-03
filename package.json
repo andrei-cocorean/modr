@@ -4,7 +4,10 @@
   "description": "extend require() calls",
   "main": "lib/modr.js",
   "scripts": {
-    "test": "NODE_ENV=development mocha --opts mocha.opts src/*_test.js"
+    "clean": "if [ -e lib ]; then rm -r lib; fi",
+    "build": "babel src -d lib -s",
+    "test": "NODE_ENV=development mocha --opts mocha.opts src/*_test.js",
+    "prepublish": "git stash save -u \"prepublish $(git describe --always)\" && npm run clean && npm run build"
   },
   "keywords": [
     "require",
@@ -13,6 +16,18 @@
     "extensions"
   ],
   "author": "Andrei Cocorean",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andrei-cocorean/modr.git"
+  },
+  "files": [
+    "src",
+    "lib",
+    ".babelrc",
+    ".eslintrc.json",
+    "mocha.opts",
+    "register.js"
+  ],
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.6.4",
