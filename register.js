@@ -1,2 +1,1 @@
-import {register} from './modr'
-register()
+require('./lib/modr').register()

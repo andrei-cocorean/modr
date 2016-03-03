@@ -2,9 +2,9 @@
   "name": "modr",
   "version": "0.0.0",
   "description": "extend require() calls",
-  "main": "modr.js",
+  "main": "lib/modr.js",
   "scripts": {
-    "test": "NODE_ENV=development mocha --opts mocha.opts modr_test.js"
+    "test": "NODE_ENV=development mocha --opts mocha.opts src/*_test.js"
   },
   "keywords": [
     "require",
@@ -27,7 +27,6 @@
     "mocha": "^2.4.5",
     "mocha-clean": "^1.0.0",
     "sinon": "^1.17.3",
-    "sinon-chai": "^2.8.0",
-    "source-map-support": "^0.4.0"
+    "sinon-chai": "^2.8.0"
   }
 }
