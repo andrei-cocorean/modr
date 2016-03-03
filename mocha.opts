@@ -1,0 +1,3 @@
+-R dot
+--compilers js:babel-register
+-r mocha-clean
