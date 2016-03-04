@@ -59,9 +59,11 @@ export function deregister () {
  * The predicate is a function (request) -> bool. If it returns true the request is passed
  * through the plugin. The default predicate always returns true.
  *
- * e.g. the following will promisify only the 'fs' module
- *
+ * e.g. the following will promisify only the 'fs' module:
  * modr.use(request => request === 'fs', requirePromisify)
+ *
+ * Both the predicate and plugin receive to the parent module as the context.
+ * i.e. the module that called require().
  *
  * @param  {function} predicate
  * @param  {function} plugin

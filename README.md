@@ -45,6 +45,27 @@ fs.readFileAsync('README.md')
   .catch(err => { /**/ })
 ```
 
+You can also use conditional plugins:
+
+```javascript
+function requireOptional (request, next) {
+  try {
+    return next(request)
+  } catch (err) {
+    return null
+  }
+}
+
+// call the plugin only if the predicate returns true
+modr.use(request => request === 'express', requireOptional)
+
+// express will be null if the module is not found
+const express = require('express')
+
+// require will throw an error if babel is not found
+const babel = require('babel')
+```
+
 ## Remove plugins
 
 ```javascript
