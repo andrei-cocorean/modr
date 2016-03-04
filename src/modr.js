@@ -29,7 +29,7 @@ export function deregister () {
 }
 
 /**
- * Tell modr to use the plugin when it loads future modules.
+ * Tell modr to use the plugin when it loads future modules that match the predicate.
  *
  * Each plugin is a function that accepts 2 parameters: request, next
  *   - request is the parameter passed to the require() call (for the first
@@ -56,17 +56,33 @@ export function deregister () {
  * modr.use(logRequire)
  * modr.use(requirePromisify)
  *
+ * The predicate is a function (request) -> bool. If it returns true the request is passed
+ * through the plugin. The default predicate always returns true.
+ *
+ * e.g. the following will promisify only the 'fs' module
+ *
+ * modr.use(request => request === 'fs', requirePromisify)
+ *
+ * @param  {function} predicate
  * @param  {function} plugin
+ * @return {function} a function that removes the plugin from the stack
  */
-export function use (plugin) {
-  pluginStack.push(plugin)
+export function use (...pair) {
+  // if the predicate is missing add the default one
+  if (pair.length < 2) {
+    pair.unshift(alwaysTrue)
+  }
+  pluginStack.push(pair)
+
   return function removePlugin () {
-    const pluginIdx = pluginStack.indexOf(plugin)
+    const pluginIdx = pluginStack.indexOf(pair)
     if (pluginIdx >= 0) {
       pluginStack.splice(pluginIdx, 1)
     }
   }
 }
+
+function alwaysTrue () { return true }
 
 /**
  * Removes all custom plugins from modr. This function is idempotent.
@@ -80,12 +96,14 @@ function modrequire (request) {
   const next = request => {
     pluginIdx--
 
-    // call the next plugin or the original require
-    if (pluginIdx >= 0) {
-      const plugin = pluginStack[pluginIdx]
-      return plugin.call(this, request, next)
-    }
-    return nodeRequire.call(this, request)
+    // call the original require at the bottom of the stack
+    if (pluginIdx < 0) return nodeRequire.call(this, request)
+
+    // call the plugin if the predicate matches
+    const [predicate, plugin] = pluginStack[pluginIdx]
+    if (predicate.call(this, request)) return plugin.call(this, request, next)
+
+    return next(request)
   }
   return next(request)
 }

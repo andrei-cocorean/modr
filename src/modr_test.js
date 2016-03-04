@@ -11,7 +11,7 @@ describe('modr', function () {
   beforeEach(function () {
     // stub the original require
     this._originalRequire = Module.prototype.require
-    this.fsModule = {isModule: true}
+    this.fsModule = {isFsModule: true}
     this.nodeRequire = stub().returns(this.fsModule)
     Module.prototype.require = this.nodeRequire
 
@@ -61,6 +61,28 @@ describe('modr', function () {
     expect(this.nodeRequire, 'original require')
       .to.be.calledWith('fs')
       .and.to.be.calledOn(module)
+  })
+
+  it('should use conditional plugins', function () {
+    function sealModule (request, next) {
+      return Object.seal(next(request))
+    }
+    const predicate = spy(request => request === 'path')
+    const plugin = spy(sealModule)
+    modr.use(predicate, plugin)
+
+    const fs = require('fs')
+    expect(fs, 'file system module').to.equal(this.fsModule)
+    expect(Object.isSealed(fs), 'fs module is sealed').to.be.false
+
+    // require the path module that should be sealed by the plugin
+    const pathModule = {isPathModule: true}
+    this.nodeRequire.returns(pathModule)
+
+    const path = require('path')
+    expect(path, 'path module').to.equal(pathModule)
+    expect(Object.isSealed(path), 'path module is sealed').to.be.true
+    expect(predicate, 'seal predicate').to.always.be.calledOn(module)
   })
 
   it('should call plugins in reverse insert order', function () {
